@@ -3,7 +3,7 @@ library(stringr)
 
 listings <- read.csv('listings_unitedstates.csv')
 
-# Remove empty listings and all leftover html tags from job descriptions
+# Remove job listings with empty descriptions and remove leftover html tags from descriptions
 listings <- listings %>%
   filter(Description != "") %>%
   mutate(Description = str_replace_all(Description, "<.*?>", ""))
