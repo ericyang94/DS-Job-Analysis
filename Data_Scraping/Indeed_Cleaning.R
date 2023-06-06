@@ -1,7 +1,7 @@
 library(dplyr)
 library(stringr)
 
-listings <- read.csv('Indeed_Scraping/listings_unitedstates.csv')
+listings <- read.csv('listings_unitedstates.csv')
 
 # Remove empty listings and all leftover html tags from job descriptions
 listings <- listings %>%
@@ -9,4 +9,4 @@ listings <- listings %>%
   mutate(Description = str_replace_all(Description, "<.*?>", ""))
   
 
-write.csv(listings,'Indeed_Scraping/listings_unitedstates_cleaned.csv')
+write.csv(listings,'listings_unitedstates_cleaned.csv')
