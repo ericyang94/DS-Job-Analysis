@@ -1,6 +1,6 @@
 # DS-Job-Analysis
 
-The objective of this project is to analyze the U.S. data scientist/analyst job market. 
+The objective of this project is to analyze the U.S. data scientist/analyst job market. I will scrape job listing data from Indeed and perform data cleaning to build a database encompassing scientist/analyst jobs across the country. Then, I will conduct some exploratory data analysis to identify some general information such as locations with the most opportunities and differences in job titles as well as salaries. Next, I will parse job summaries to identify the tools, skills, majors, and degrees that employers are currently looking for. Last but not least, I will perform feature engineering and build some models to predict data scientist/analyst job market trends in the future to provide practical recommendations to data science job seekers. 
 
 ## Goals
 
