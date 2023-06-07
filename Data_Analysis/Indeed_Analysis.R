@@ -46,6 +46,3 @@ languages %>% ggplot(aes(x = reorder(language,-proportion), y = proportion)) +
   geom_bar(stat = "identity", position = "dodge", aes(fill = Position)) +
   labs(x = "Programming Languages", y = "Proportion Mentioned", title = "Top Data Science Programming Languages by Position") +
   theme_light()
-
-
-
