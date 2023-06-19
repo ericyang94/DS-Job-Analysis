@@ -44,3 +44,89 @@ ggmap(us_map) +
   theme(legend.position = "none")
 
 
+# create leaflet interactive map for US
+
+# make borders using shapefile and get US map coordinates
+areas <- readOGR('Indeed_Analysis/us_state')
+shp <- spTransform(areas, CRS("+proj=longlat +datum=WGS84"))
+us_coordinates <- geocode("United States")
+us_lon <- us_coordinates[[1]]
+us_lat <- us_coordinates[[2]]
+
+# count jobs in each state
+states <- listings %>%
+  group_by(state) %>%
+  summarize(count = n())
+
+# make barchart
+ggplot(states, aes(x = reorder(state,-count), y = count)) +
+  geom_bar(stat = "identity", aes(fill = state)) + 
+  labs(x = "State", y = "Job Listings", title = "Job Listings in Each State") +
+  theme_light() +
+  theme(legend.position = "none")
+
+# add count data into shapefile
+shp@data <- left_join(shp@data,states, by = c('STUSPS'='state'))
+
+# define color palette
+bins <- c(1, 5, 10, 20, 50, 100, 200, 300)
+pal <- colorBin("viridis", domain = shp@data$count, bins = bins)
+
+# define labels
+labels <- sprintf("<strong>State: %s</strong><br/>Count: %g", shp@data$NAME, shp@data$count) %>% 
+  lapply(htmltools::HTML)
+
+# generate map
+leaflet(shp) %>% 
+  addTiles() %>% 
+  setView(lat=us_lat, lng=us_lon,zoom = 4) %>%
+  addProviderTiles(providers$CartoDB.Positron) %>%
+  addPolygons(data=shp,
+              weight=1,
+              fillColor = ~pal(count),
+              fillOpacity = 0.5,
+              highlightOptions = highlightOptions(color = "white", weight = 2,bringToFront = TRUE),
+              label=~labels) %>%
+  addLegend(pal = pal, 
+            values = ~count,
+            opacity = 0.5, 
+            title = "Job Listings",
+            position = "bottomleft")
+
+
+# create leaflet interactive map with cities
+
+# count jobs in each city
+cities <- listings %>%
+  group_by(city) %>%
+  summarize(count = n())
+
+cities <- cities %>%
+  mutate(coordinates = geocode(paste0(city,", USA")), lon = coordinates[[1]], lat = coordinates[[2]])
+
+write.csv(cities,'Indeed_Analysis/listings_unitedstates_map_2.csv')
+
+# define color palette
+bins <- c(1, 5, 10, 20, 40, 60)
+pal <- colorBin("viridis", domain = cities$count, bins = bins)
+
+# define labels
+labels <- sprintf("<strong>City: %s</strong><br/>Count: %g", cities$city, cities$count) %>% 
+  lapply(htmltools::HTML)
+
+# generate map
+leaflet(shp) %>% 
+  addTiles() %>% 
+  setView(lat=us_lat, lng=us_lon,zoom = 4) %>%
+  addProviderTiles(providers$CartoDB.Positron) %>%
+  addPolygons(data=shp,
+              weight=1,
+              fillColor = "gray",
+              fillOpacity = 0.1) %>%
+  addCircles(data = cities, lng = ~lon, lat = ~lat, weight = 30, radius = sqrt(cities$count)*2, label=~labels, color = ~pal(count)) %>%
+  addLegend(pal = pal, 
+            values = ~count,
+            opacity = 0.5, 
+            title = "Job Listings in California",
+            position = "bottomleft")
+
